@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 public class OneWordStory extends ListenerAdapter
@@ -216,10 +217,10 @@ public class OneWordStory extends ListenerAdapter
                 String parsedString = builder.toString().trim().replaceAll(" -", "").replaceAll("- ", "");
                 if(inPrivateMessage)
                 {
-                    Main.getJDA().retrieveUserById(userID).queue(user -> user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("**Zusammenfassung der laufenden Geschichte:**\n\n"+ parsedString).queue(success -> {}, error -> {})));
+                    Main.getJDA().retrieveUserById(userID).queue(user -> user.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("**Zusammenfassung der laufenden Geschichte:**\n\n"+ parsedString).allowedMentions(EnumSet.noneOf(Message.MentionType.class)).queue(success -> {}, error -> {})));
                 }else
                 {
-                    textChannel.sendMessage("**Eure Geschichte:**\n\n"+parsedString).queue();
+                    textChannel.sendMessage("**Eure Geschichte:**\n\n"+parsedString).allowedMentions(EnumSet.noneOf(Message.MentionType.class)).queue();
                     CURRENT_STORY.clear();
                     lastStart = OffsetDateTime.now();
                 }
