@@ -20,11 +20,13 @@ import net.dv8tion.jda.api.entities.*;
 public class Util
 {
 
-	
+	public static final String LOGO_URL = "https://i.imgur.com/gO4qbaz.gif";
+	public static final String RULE_CHANNEL_JUMP_URL = "https://discord.com/channels/713469621532885002/745264850950946926/802991263325749268";
+	public static final String INVITE_URL = "https://discord.gg/Ktt4pbEmeK";
 	public static void addListeners()
 	{
 		JDA jda = Main.getJDA();
-		jda.addEventListener(new OneWordStory(), new Zaehlen(), new BinaerZaehlen());
+		jda.addEventListener(new OneWordStory(), new Zaehlen(), new BinaerZaehlen(), new OnGuildMemberJoin(), new CommandEvent(), new ButtonListener());
 	}
 	
 	public static String getPath()

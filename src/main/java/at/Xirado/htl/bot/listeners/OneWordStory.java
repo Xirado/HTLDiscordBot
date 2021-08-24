@@ -24,15 +24,15 @@ public class OneWordStory extends ListenerAdapter
     @Override
     public void onGuildMessageReceived(final @NotNull GuildMessageReceivedEvent event)
     {
+        TextChannel c = event.getChannel();
+        if(c.getIdLong() != CHANNEL_ID) return;
+        if(event.getAuthor().getIdLong() == Main.getJDA().getSelfUser().getIdLong()) return;
+        if(event.isWebhookMessage() || event.getAuthor().isBot())
+        {
+            event.getMessage().delete().queue(s -> {}, e -> {});
+            return;
+        }
         Main.SCHEDULED_EXECUTOR_SERVICE.submit(() -> {
-            TextChannel c = event.getChannel();
-            if(c.getIdLong() != CHANNEL_ID) return;
-            if(event.getAuthor().getIdLong() == Main.getJDA().getSelfUser().getIdLong()) return;
-            if(event.isWebhookMessage() || event.getAuthor().isBot())
-            {
-                event.getMessage().delete().queue(s -> {}, e -> {});
-                return;
-            }
             String content = event.getMessage().getContentRaw();
             User sender = event.getAuthor();
             Member member = event.getMember();

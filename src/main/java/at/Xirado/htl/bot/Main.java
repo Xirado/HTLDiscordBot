@@ -14,7 +14,11 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 public class Main
 {
@@ -28,6 +32,8 @@ public class Main
 		return jda;
 	}
 	public static JSON json;
+
+	public static Guild server;
 
 	public static void main(String[] args)
 	{
@@ -50,13 +56,13 @@ public class Main
 			Util.addListeners();
 			Util.initMemberCount();
 			OneWordStory.firstStart = true;
-			Guild server = jda.getGuildById(713469621532885002L);
-			if(server != null)
+			server = jda.getGuildById(713469621532885002L);
+			if (server != null)
 			{
 				TextChannel oneWordStory = server.getTextChannelById(OneWordStory.CHANNEL_ID);
 				if(oneWordStory != null)
 				{
-					oneWordStory.sendMessage("\uD83E\uDD16 Bip Bop \uD83E\uDD16 Ich wurde neugestartet und die letzte laufende Geschichte wurde gelöscht.").queue();
+					oneWordStory.sendMessage("\uD83E\uDD16 Bip Bop \uD83E\uDD16 Ich wurde neugestartet und die letzte laufende Geschichte wurde beendet.").queue();
 				}
 			}
 
