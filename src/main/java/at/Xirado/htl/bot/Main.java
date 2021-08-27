@@ -32,6 +32,7 @@ public class Main
 		return jda;
 	}
 	public static JSON json;
+	public static long guildId;
 
 	public static Guild server;
 
@@ -48,9 +49,29 @@ public class Main
 			}
 			json = JSON.parse(file);
 			TOKEN = json.get("token", String.class);
+			guildId = json.get("guild", Long.class);
 			path = Util.getPath();
 			jda = JDABuilder.create(TOKEN, EnumSet.allOf(GatewayIntent.class)).build();
 			jda.awaitReady();
+			jda.retrieveCommands().queue(x -> {
+				if (!x.isEmpty())
+					jda.updateCommands().queue();
+			});
+			Guild guild = jda.getGuildById(guildId);
+			if (guild != null)
+			{
+				CommandListUpdateAction action = guild.updateCommands();
+				action.addCommands(new CommandData("voicetarget", "Erstellt eine Einladung mit Applikationen. (Youtube Watchtogether, Poker, etc...)")
+						.addOptions(new OptionData(OptionType.STRING, "application", "Die Applikation").setRequired(true)
+								.addChoice("Youtube Together", "755600276941176913")
+								.addChoice("Poker", "755827207812677713")
+								.addChoice("Betrayal.io", "773336526917861400")
+								.addChoice("Fishington.io", "814288819477020702")
+								.addChoice("Schach", "832012586023256104")
+						)
+				);
+				action.queue();
+			}
 			jda.getPresence().setPresence(OnlineStatus.ONLINE, false);
 			System.out.println("HTLAustria.eu » "+"Erfolgreich als @"+jda.getSelfUser().getAsTag()+" angemeldet!");
 			Util.addListeners();
