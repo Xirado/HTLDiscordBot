@@ -24,7 +24,7 @@ public class VoiceTargetCommand implements Command
             return;
         }
         GuildVoiceState voiceState = member.getVoiceState();
-        if(voiceState == null || voiceState.getChannel() == null)
+        if (voiceState == null || voiceState.getChannel() == null)
         {
             event.reply("Dazu musst du in einem Sprachkanal sein!").setEphemeral(true).queue();
             return;
