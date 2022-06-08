@@ -1,85 +1,90 @@
 package at.xirado.htl.listener
 
 import at.xirado.htl.ONE_WORD_STORY_CHANNEL_ID
-import at.xirado.htl.coroutineScope
 import at.xirado.htl.hasRole
+import dev.minn.jda.ktx.CoroutineEventListener
 import dev.minn.jda.ktx.await
-import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.hooks.ListenerAdapter
-import java.lang.StringBuilder
 import java.time.OffsetDateTime
 import java.util.*
 
-class OneWordStoryListener : ListenerAdapter() {
+class OneWordStoryListener : CoroutineEventListener {
 
     val currentStory: MutableList<Long> = Collections.synchronizedList(mutableListOf())
     var lastStart = OffsetDateTime.now()
     var lastMember: Long = 0
 
-    override fun onMessageReceived(event: MessageReceivedEvent) {
+    override suspend fun onEvent(event: GenericEvent) {
+        when (event) {
+            is MessageReceivedEvent -> onMessageReceived(event)
+        }
+    }
+
+    private suspend fun onMessageReceived(event: MessageReceivedEvent) {
         if (event.channel.idLong != ONE_WORD_STORY_CHANNEL_ID)
+            return
+
+        if (event.isWebhookMessage)
             return
 
         if (event.author.idLong == event.jda.selfUser.idLong)
             return
 
-        coroutineScope.launch {
-            if (event.isWebhookMessage || event.author.isBot) {
-                event.message.delete().await()
-                return@launch
-            }
-
-            val content = event.message.contentRaw
-            val member = event.member!!
-            if (content.equals("!geschichte", true)) {
-                event.message.delete().await()
-                sendHistory(true, event.author.idLong, event.jda)
-                return@launch
-            }
-
-            if (content.equals("!ende", true)) {
-                if (member.hasRole(749958593113227275) || member.hasRole(713478147634626583) || member.hasPermission(Permission.ADMINISTRATOR))
-                    sendHistory(false, 0, event.jda)
-                else
-                    event.message.delete().await()
-                return@launch
-            }
-
-            if (content.startsWith("!")) {
-                event.message.delete().await()
-                return@launch
-            }
-
-            if (lastMember == event.member!!.idLong) {
-                event.message.delete().await()
-                return@launch
-            }
-
-            if(content.contains("\n") || content.contains("\r") || content.contains("\u200B") || content.contains("\u001b")) {
-                event.message.delete().await()
-                return@launch
-            }
-            val args = content.split("\\s+")
-
-            if (args.size > 1) {
-                if (args.size > 2) {
-                    event.message.delete().await()
-                    return@launch
-                }
-                if (content.startsWith(", ") || content.startsWith(". ")) {
-                    currentStory.add(event.messageIdLong)
-                    lastMember = event.member!!.idLong
-                } else {
-                    event.message.delete().await()
-                }
-                return@launch
-            }
-            lastMember = event.member!!.idLong
-            currentStory.add(event.messageIdLong)
+        if (event.author.isBot) {
+            event.message.delete().await()
+            return
         }
+
+        val content = event.message.contentRaw
+        val member = event.member!!
+        if (content.equals("!geschichte", true)) {
+            event.message.delete().await()
+            sendHistory(true, event.author.idLong, event.jda)
+            return
+        }
+
+        if (content.equals("!ende", true)) {
+            if (member.hasRole(749958593113227275) || member.hasRole(713478147634626583) || member.hasPermission(Permission.ADMINISTRATOR))
+                sendHistory(false, 0, event.jda)
+            else
+                event.message.delete().await()
+            return
+        }
+
+        if (content.startsWith("!")) {
+            event.message.delete().await()
+            return
+        }
+
+        if (lastMember == event.member!!.idLong) {
+            event.message.delete().await()
+            return
+        }
+
+        if(content.contains("\n") || content.contains("\r") || content.contains("\u200B") || content.contains("\u001b")) {
+            event.message.delete().await()
+            return
+        }
+        val args = content.split("\\s+")
+
+        if (args.size > 1) {
+            if (args.size > 2) {
+                event.message.delete().await()
+                return
+            }
+            if (content.startsWith(", ") || content.startsWith(". ")) {
+                currentStory.add(event.messageIdLong)
+                lastMember = event.member!!.idLong
+            } else {
+                event.message.delete().await()
+            }
+            return
+        }
+        lastMember = event.member!!.idLong
+        currentStory.add(event.messageIdLong)
     }
 
     private suspend fun sendHistory(inPrivateMessage: Boolean, userId: Long, jda: JDA) {
