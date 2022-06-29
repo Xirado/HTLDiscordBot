@@ -40,6 +40,10 @@ class OneWordStoryListener : CoroutineEventListener {
 
         val content = event.message.contentRaw
         val member = event.member!!
+
+        if (content.startsWith("//"))
+            return
+
         if (content.equals("!geschichte", true)) {
             event.message.delete().await()
             sendHistory(true, event.author.idLong, event.jda)

@@ -1,6 +1,7 @@
 @file:JvmName("Main")
 package at.xirado.htl
 
+import at.xirado.htl.command.CommandRegistry
 import at.xirado.htl.io.FileLoader
 import at.xirado.htl.io.nullOrBlank
 import at.xirado.htl.listener.*
@@ -61,7 +62,7 @@ fun main() {
         .addEventListeners(
             MemberJoinListener(), ButtonListener(), MessageListener(),
             CountingListener(), BinaryCountingListener(), OneWordStoryListener(),
-            ReadyEvent()
+            ReadyEvent(), CommandRegistry()
         )
         .setEventManager(CoroutineEventManager(coroutineScope))
         .disableCache(CacheFlag.VOICE_STATE, CacheFlag.EMOTE)
